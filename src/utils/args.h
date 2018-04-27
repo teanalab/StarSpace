@@ -25,6 +25,7 @@ class Args {
     std::string initModel;
     std::string fileFormat;
     std::string label;
+    std::string relation;
     std::string basedoc;
     std::string loss;
     std::string similarity;

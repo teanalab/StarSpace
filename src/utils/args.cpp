@@ -46,6 +46,7 @@ Args::Args() {
   trainMode = 0;
   fileFormat = "fastText";
   label = "__label__";
+  relation = "__relation__";
   bucket = 2000000;
   ngrams = 1;
   loss = "hinge";
@@ -119,6 +120,8 @@ void Args::parseArgs(int argc, char** argv) {
       fileFormat = string(argv[i + 1]);
     } else if (strcmp(argv[i], "-label") == 0) {
       label = string(argv[i + 1]);
+    } else if (strcmp(argv[i], "-relation") == 0) {
+      relation = string(argv[i + 1]);
     } else if (strcmp(argv[i], "-loss") == 0) {
       loss = string(argv[i + 1]);
     } else if (strcmp(argv[i], "-similarity") == 0) {

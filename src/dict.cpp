@@ -25,7 +25,7 @@ const std::string Dictionary::EOS = "</s>";
 const uint32_t Dictionary::HASH_C = 116049371;
 
 Dictionary::Dictionary(shared_ptr<Args> args) : args_(args),
-  hashToIndex_(MAX_VOCAB_SIZE, -1), size_(0), nwords_(0), nlabels_(0),
+  hashToIndex_(MAX_VOCAB_SIZE, -1), size_(0), nwords_(0), nlabels_(0), nrelations_(0),
   ntokens_(0)
   {
     entryList_.clear();
@@ -66,6 +66,12 @@ const std::string& Dictionary::getLabel(int32_t lid) const {
   return entryList_[lid + nwords_].symbol;
 }
 
+const std::string& Dictionary::getRelation(int32_t rid) const {
+  assert(rid >= 0);
+  assert(rid < nrelations_);
+  return entryList_[rid + nwords_ + nrelations_].symbol;
+}
+
 entry_type Dictionary::getType(int32_t id) const {
   assert(id >= 0);
   assert(id < size_);
@@ -73,7 +79,7 @@ entry_type Dictionary::getType(int32_t id) const {
 }
 
 entry_type Dictionary::getType(const string& w) const {
-  return (w.find(args_->label) == 0)? entry_type::label : entry_type::word;
+  return (w.find(args_->label) == 0)? entry_type::label : ((w.find(args_->relation) == 0)? entry_type::relation : entry_type::word);
 }
 
 void Dictionary::insert(const string& symbol) {
@@ -95,6 +101,7 @@ void Dictionary::save(std::ostream& out) const {
   out.write((char*) &size_, sizeof(int32_t));
   out.write((char*) &nwords_, sizeof(int32_t));
   out.write((char*) &nlabels_, sizeof(int32_t));
+  out.write((char*) &nrelations_, sizeof(int32_t));
   out.write((char*) &ntokens_, sizeof(int64_t));
   for (int32_t i = 0; i < size_; i++) {
     entry e = entryList_[i];
@@ -111,6 +118,7 @@ void Dictionary::load(std::istream& in) {
   in.read((char*) &size_, sizeof(int32_t));
   in.read((char*) &nwords_, sizeof(int32_t));
   in.read((char*) &nlabels_, sizeof(int32_t));
+  in.read((char*) &nrelations_, sizeof(int32_t));
   in.read((char*) &ntokens_, sizeof(int64_t));
   for (int32_t i = 0; i < size_; i++) {
     char c;
@@ -166,6 +174,8 @@ void Dictionary::readFromFile(
   std::cerr << "\rRead " << ntokens_  / 1000000 << "M words" << std::endl;
   std::cerr << "Number of words in dictionary:  " << nwords_ << std::endl;
   std::cerr << "Number of labels in dictionary: " << nlabels_ << std::endl;
+  std::cerr << "Number of relations in dictionary: " << nrelations_ << std::endl;
+
   if (lines_read == 0) {
     std::cerr << "ERROR: Empty file." << std::endl;
     exit(EXIT_FAILURE);
@@ -177,8 +187,9 @@ void Dictionary::readFromFile(
   }
 }
 
-// Sort the dictionary by [word, label] order and by number of occurance.
+// Sort the dictionary by [word, label, relation] order and by number of occurance.
 // Removes word / label that does not pass respective threshold.
+// Do not remove relations.
 void Dictionary::threshold(int64_t t, int64_t tl) {
   sort(entryList_.begin(), entryList_.end(), [](const entry& e1, const entry& e2) {
         if (e1.type != e2.type) return e1.type < e2.type;
@@ -198,12 +209,14 @@ void Dictionary::computeCounts() {
   size_ = 0;
   nwords_ = 0;
   nlabels_ = 0;
+  nrelations_ = 0;
   std::fill(hashToIndex_.begin(), hashToIndex_.end(), -1);
   for (auto it = entryList_.begin(); it != entryList_.end(); ++it) {
     int32_t h = find(it->symbol);
     hashToIndex_[h] = size_++;
     if (it->type == entry_type::word) nwords_++;
     if (it->type == entry_type::label) nlabels_++;
+    if (it->type == entry_type::relation) nrelations_++;
   }
 }
 
@@ -223,6 +236,7 @@ void Dictionary::loadDictFromModel(const string& modelfile) {
 
   std::cout << "Number of words in dictionary:  " << nwords_ << std::endl;
   std::cout << "Number of labels in dictionary: " << nlabels_ << std::endl;
+  std::cout << "Number of relations in dictionary: " << nrelations_ << std::endl;
 }
 
 } // namespace

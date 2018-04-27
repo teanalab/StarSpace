@@ -47,6 +47,31 @@ bool DataParser::parse(
   return parse(toks, rslts);
 }
 
+bool DataParser::parseHRT(
+    std::string& s,
+    ParseResults& rslts,
+    const string& sep) {
+
+  chomp(s);
+  vector<string> toks;
+  boost::split(toks, s, boost::is_any_of(string(sep)));
+
+  return parseHRT(toks, rslts);
+}
+
+
+bool DataParser::parseTRH(
+    std::string& s,
+    ParseResults& rslts,
+    const string& sep) {
+
+  chomp(s);
+  vector<string> toks;
+  boost::split(toks, s, boost::is_any_of(string(sep)));
+
+  return parseTRH(toks, rslts);
+}
+
 void DataParser::parseForDict(
     string& line,
     vector<string>& tokens,
@@ -80,6 +105,12 @@ bool DataParser::check(const ParseResults& example) {
   } if (args_->trainMode == 5) {
     // only requires lhs.
     return !example.LHSTokens.empty();
+  } else if (args_->trainMode == 6) {
+    if (example.type == triple_type::regular) {
+      return !example.LHSTokens.empty() && example.RHSTokens.size() == 1;
+    } else {
+      return example.LHSTokens.size() == 2 && example.RHSTokens.size() == 1;
+    }
   } else {
     // lhs is not required, but rhs should contain at least 2 example
     return example.RHSTokens.size() > 1;
@@ -141,6 +172,7 @@ bool DataParser::parse(
     }
 
     entry_type type = dict_->getType(wid);
+    assert(type != entry_type::relation);
     if (type == entry_type::word) {
       rslts.LHSTokens.push_back(make_pair(wid, weight));
     }
@@ -151,6 +183,74 @@ bool DataParser::parse(
 
   if (args_->ngrams > 1) {
     addNgrams(tokens, rslts.LHSTokens, args_->ngrams);
+  }
+
+  return check(rslts);
+}
+
+bool DataParser::parseHRT(
+    const std::vector<std::string>& tokens,
+    ParseResults& rslts) {
+
+  assert(tokens.size() == 3);
+
+  for (int index = 0; index < tokens.size(); ++index) {
+    string token = tokens[index];
+
+    int32_t wid = dict_->getId(token);
+    if (wid < 0) {
+      continue;
+    }
+
+    entry_type type = dict_->getType(wid);
+    if (index == 0 || index == 2) {
+      assert(type == entry_type::label);
+    } else {
+      assert(index == 1);
+      assert(type == entry_type::relation);
+    }
+    rslts.type = triple_type::triple;
+    if (index == 0) {
+      rslts.LHSTokens.push_back(make_pair(wid, 1.0));
+    } else if (index == 1) {
+      rslts.LHSTokens.push_back(make_pair(wid, 1.0));
+    } else { // index == 2
+      rslts.RHSTokens.push_back(make_pair(wid, 1.0));
+    }
+  }
+
+  return check(rslts);
+}
+
+bool DataParser::parseTRH(
+    const std::vector<std::string>& tokens,
+    ParseResults& rslts) {
+
+  assert(tokens.size() == 3);
+
+  for (int index = 0; index < tokens.size(); ++index) {
+    string token = tokens[index];
+
+    int32_t wid = dict_->getId(token);
+    if (wid < 0) {
+      continue;
+    }
+
+    entry_type type = dict_->getType(wid);
+    if (index == 0 || index == 2) {
+      assert(type == entry_type::label);
+    } else {
+      assert(index == 1);
+      assert(type == entry_type::relation);
+    }
+    rslts.type = triple_type::triple;
+    if (index == 0) {
+      rslts.RHSTokens.push_back(make_pair(wid, 1.0));
+    } else if (index == 1) {
+      rslts.LHSTokens.push_back(make_pair(wid, -1.0));
+    } else { // index == 2
+      rslts.LHSTokens.push_back(make_pair(wid, 1.0));
+    }
   }
 
   return check(rslts);

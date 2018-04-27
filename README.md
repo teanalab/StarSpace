@@ -1,6 +1,6 @@
 # StarSpace for multitask learning of TransE + word2vec + alignment
 
-run with `-trainMode 0 -fileFormat fastText -trainWord`
+run with `-trainMode 6 -fileFormat fastText -loss hinge -trainWord -label 'e:' -relation 'r:'`
 
 Input data.txt:
 ```

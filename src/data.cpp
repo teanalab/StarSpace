@@ -53,7 +53,16 @@ void InternDataHandler::loadFromFile(
     [&](std::string& line) {
       auto& corpus = corpora[getThreadID()];
       ParseResults example;
-      if (parser->parse(line, example)) {
+      if (args_->trainMode == 6 && line.find(args_->label) == 0 && std::count(line.begin(), line.end(), '\t') == 2) {
+        // add "h + r = t" example
+        ParseResults hrtExample;
+        parser->parseHRT(line, hrtExample);
+        corpus.push_back(hrtExample);
+        // add "t - r = h" example
+        ParseResults trhExample;
+        parser->parseTRH(line, trhExample);
+        corpus.push_back(trhExample);
+      } else if (parser->parse(line, example)) {
         corpus.push_back(example);
       }
     },

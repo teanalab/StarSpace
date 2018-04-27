@@ -26,7 +26,7 @@ namespace starspace {
 
 class DataParser;
 
-enum class entry_type : int8_t {word=0, label=1};
+enum class entry_type : int8_t {word=0, label=1, relation=2};
 
 struct entry {
   std::string symbol;
@@ -43,12 +43,14 @@ class Dictionary {
     int32_t size() const { return size_; };
     int32_t nwords() const { return nwords_; };
     int32_t nlabels() const { return nlabels_; };
+    int32_t nrelations() const { return nrelations_; };
     int32_t ntokens() const { return ntokens_; };
     int32_t getId(const std::string&) const;
     entry_type getType(int32_t) const;
     entry_type getType(const std::string&) const;
     const std::string& getSymbol(int32_t) const;
     const std::string& getLabel(int32_t) const;
+    const std::string& getRelation(int32_t) const;
 
     uint32_t hash(const std::string& str) const;
     void insert(const std::string&);
@@ -79,6 +81,7 @@ class Dictionary {
     int32_t size_;
     int32_t nwords_;
     int32_t nlabels_;
+    int32_t nrelations_;
     int64_t ntokens_;
 };
 

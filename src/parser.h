@@ -39,10 +39,13 @@ namespace starspace {
 
 typedef std::pair<int32_t, float> Base;
 
+enum class triple_type : int8_t {regular=0, triple=1};
+
 struct ParseResults {
   float weight = 1.0;
   std::vector<Base> LHSTokens;
   std::vector<Base> RHSTokens;
+  triple_type type = triple_type::regular;
   std::vector<std::vector<Base>> RHSFeatures;
 };
 
@@ -59,6 +62,17 @@ public:
       ParseResults& rslt,
       const std::string& sep="\t ");
 
+  virtual bool parseHRT(
+      std::string& s,
+      ParseResults& rslt,
+      const std::string& sep="\t");
+
+
+  virtual bool parseTRH(
+      std::string& s,
+      ParseResults& rslt,
+      const std::string& sep="\t");
+
   virtual void parseForDict(
       std::string& s,
       std::vector<std::string>& tokens,
@@ -69,6 +83,14 @@ public:
       std::vector<Base>& rslt);
 
   bool parse(
+      const std::vector<std::string>& tokens,
+      ParseResults& rslt);
+
+  bool parseHRT(
+      const std::vector<std::string>& tokens,
+      ParseResults& rslt);
+
+  bool parseTRH(
       const std::vector<std::string>& tokens,
       ParseResults& rslt);
 
