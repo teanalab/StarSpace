@@ -136,7 +136,7 @@ void DataParser::addNgrams(
     for (int32_t j = i + 1; j < hashes.size() && j < i + n; j++) {
       h = h * Dictionary::HASH_C + hashes[j];
       int64_t id = h % args_->bucket;
-      line.push_back(make_pair(dict_->nwords() + dict_->nlabels() + id, 1.0));
+      line.push_back(make_pair(dict_->nwords() + dict_->nlabels() + dict_->nrelations() + id, 1.0));
     }
   }
 }

@@ -40,7 +40,7 @@ EmbedModel::EmbedModel(
 
 void EmbedModel::initModelWeights() {
   assert(dict_ != nullptr);
-  size_t num_lhs = dict_->nwords() + dict_->nlabels();
+  size_t num_lhs = dict_->nwords() + dict_->nlabels() + dict_->nrelations();
 
   if (args_->ngrams > 1) {
     num_lhs += args_->bucket;
@@ -619,7 +619,7 @@ EmbedModel::kNN(shared_ptr<SparseLinear<Real>> lookup,
                 int numSim) {
 
     typedef pair<int32_t, Real> Cand;
-    int  maxn = dict_->nwords() + dict_->nlabels();
+    int  maxn = dict_->nwords() + dict_->nlabels() + dict_->nrelations();
 
     vector<Cand> mostSimilar(std::min(numSim, maxn));
     for (auto& s: mostSimilar) {
@@ -755,7 +755,7 @@ void EmbedModel::loadTsv(istream& in, const string sep) {
 
 void EmbedModel::saveTsv(ostream& out, const char sep) const {
   auto dumpOne = [&](shared_ptr<SparseLinear<Real>> emb) {
-    auto size =  dict_->nwords() + dict_->nlabels();
+    auto size =  dict_->nwords() + dict_->nlabels() + dict_->nrelations();
     for (size_t i = 0; i < size; i++) {
       // Skip invalid IDs.
       string symbol = dict_->getSymbol(i);

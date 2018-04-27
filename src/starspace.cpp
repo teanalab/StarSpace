@@ -239,7 +239,7 @@ MatrixRow StarSpace::getNgramVector(const string& phrase) {
     }
   }
   int64_t id = h % args_->bucket;
-  return model_->getLHSEmbeddings()->row(id + dict_->nwords() + dict_->nlabels());
+  return model_->getLHSEmbeddings()->row(id + dict_->nwords() + dict_->nlabels() + dict_->nrelations());
 }
 
 void StarSpace::nearestNeighbor(const string& line, int k) {

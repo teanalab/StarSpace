@@ -69,7 +69,7 @@ const std::string& Dictionary::getLabel(int32_t lid) const {
 const std::string& Dictionary::getRelation(int32_t rid) const {
   assert(rid >= 0);
   assert(rid < nrelations_);
-  return entryList_[rid + nwords_ + nrelations_].symbol;
+  return entryList_[rid + nwords_ + nlabels_].symbol;
 }
 
 entry_type Dictionary::getType(int32_t id) const {
