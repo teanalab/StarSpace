@@ -209,7 +209,7 @@ void Args::parseArgs(int argc, char** argv) {
     }
   }
   // check for trainMode
-  if ((trainMode < 0) || (trainMode > 5)) {
+  if ((trainMode < 0) || (trainMode > 6)) {
     cerr << "Uknown trainMode. We currently support the follow train modes:\n";
     cerr << "trainMode 0: at training time, one label from RHS is picked as true label; LHS is the same from input.\n";
     cerr << "trainMode 1: at training time, one label from RHS is picked as true label; LHS is the bag of the rest RHS labels.\n";
@@ -217,6 +217,7 @@ void Args::parseArgs(int argc, char** argv) {
     cerr << "trainMode 3: at training time, one label from RHS is picked as true label and another label from RHS is picked as LHS.\n";
     cerr << "trainMode 4: at training time, the first label from RHS is picked as LHS and the second one picked as true label.\n";
     cerr << "trainMode 5: continuous bag of words training.\n";
+    cerr << "trainMode 6: multitask learning for TransE + word2vec + alignment.\n";
     exit(EXIT_FAILURE);
   }
   // check for loss type
@@ -253,7 +254,7 @@ void Args::printHelp() {
        << "  -label           labels prefix [" << label << "]\n"
        << "\nThe following arguments for training are optional:\n"
        << "  -initModel       if not empty, it loads a previously trained model in -initModel and carry on training.\n"
-       << "  -trainMode       takes value in [0, 1, 2, 3, 4, 5], see Training Mode Section. [" << trainMode << "]\n"
+       << "  -trainMode       takes value in [0, 1, 2, 3, 4, 5, 6], see Training Mode Section. [" << trainMode << "]\n"
        << "  -fileFormat      currently support 'fastText' and 'labelDoc', see File Format Section. [" << fileFormat << "]\n"
        << "  -saveEveryEpoch  save intermediate models after each epoch [" << saveEveryEpoch << "]\n"
        << "  -saveTempModel   save intermediate models after each epoch with an unique name including epoch number [" << saveTempModel << "]\n"

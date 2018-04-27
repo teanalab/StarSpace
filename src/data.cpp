@@ -104,6 +104,13 @@ void InternDataHandler::convert(
     assert(example.RHSTokens.size() > 0);
     auto idx = rand() % example.RHSTokens.size();
     rslt.RHSTokens.push_back(example.RHSTokens[idx]);
+  } else if (args_->trainMode == 6) {
+    assert(example.RHSTokens.size() == 1);
+    if (example.type == triple_type::triple) {
+      assert(example.LHSTokens.size() == 2);
+    } else {
+      assert(example.LHSTokens.size() > 0);
+    }
   } else {
     assert(example.RHSTokens.size() > 1);
     if (args_->trainMode == 1) {
@@ -175,7 +182,9 @@ void InternDataHandler::getWordExamples(
 
   assert(idx < size_);
   const auto& example = examples_[idx];
-  getWordExamples(example.LHSTokens, rslts);
+  if (example.type == triple_type::regular) {
+    getWordExamples(example.LHSTokens, rslts);
+  }
 }
 
 void InternDataHandler::addExample(const ParseResults& example) {
@@ -242,9 +251,12 @@ void InternDataHandler::initWordNegatives() {
 
 Base InternDataHandler::genRandomWord() const {
   assert(size_ > 0);
-  auto& ex = examples_[rand() % size_];
-  int r = rand() % ex.LHSTokens.size();
-  return ex.LHSTokens[r];
+  auto* ex = &examples_[rand() % size_];
+  while (ex->type != triple_type::regular) {
+    ex = &examples_[rand() % size_];
+  }
+  int r = rand() % ex->LHSTokens.size();
+  return ex->LHSTokens[r];
 }
 
 // Randomly sample one example and randomly sample a label from this example

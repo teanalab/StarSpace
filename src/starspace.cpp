@@ -365,8 +365,8 @@ void StarSpace::printDoc(ostream& ofs, const vector<Base>& tokens) {
 
 void StarSpace::evaluate() {
   // check that it is not in trainMode 5
-  if (args_->trainMode == 5) {
-    std::cerr << "Test is undefined in trainMode 5. Please use other trainMode for testing.\n";
+  if (args_->trainMode == 5 || args_->trainMode == 6) {
+    std::cerr << "Test is undefined in trainMode 5 and 6. Please use other trainMode for testing.\n";
     exit(EXIT_FAILURE);
   }
 
