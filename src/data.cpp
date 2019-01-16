@@ -108,8 +108,10 @@ void InternDataHandler::convert(
     assert(example.RHSTokens.size() == 1);
     if (example.type == triple_type::triple) {
       assert(example.LHSTokens.size() == 2);
+      rslt.RHSTokens.push_back(example.RHSTokens[0]);
     } else {
       assert(example.LHSTokens.size() > 0);
+      rslt.RHSTokens.push_back(example.RHSTokens[0]);
     }
   } else {
     assert(example.RHSTokens.size() > 1);

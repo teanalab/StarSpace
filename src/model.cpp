@@ -133,6 +133,7 @@ Real EmbedModel::trainOneExample(
     bool trainWord) {
 
   if (s.RHSTokens.size() == 0 || s.LHSTokens.size() == 0) {
+    cout << "Warning: No RHS or LHS tokens in example!" << endl;
     return 0.0;
   }
 
